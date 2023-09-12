@@ -24,14 +24,6 @@ begin_time = time(00, 00)
 end_time = time(23, 15)
 max_try = 500
 booked_time = ''
-# reservation_time and reservation_name are given as arguments when python script runs
-# reservation_time = int(sys.argv[1])
-# reservation_name = sys.argv[2]
-
-
-# driver = webdriver.Chrome(options=options)
-# '/Users/my_name/dev/stranger_bot/driver/chromedriver',
-# options=options
 
 myt = timezone(timedelta(hours=+8), 'MYT')
 
@@ -135,9 +127,6 @@ def make_a_reservation(index) -> bool:
                 latest[-3].click()
 
             # Click add booking button after selecting latest time
-            # driver.find_element(
-            #     By.XPATH, '//*[@id="main"]/div/div/form/table/tbody/tr[15]/td/input').click()
-
             driver.find_element(
                 By.XPATH, '//*[@id="main"]/div/div/form/table/tbody/tr[15]/td/input').click()
 
