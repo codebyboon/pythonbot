@@ -12,7 +12,7 @@ from joblib import Parallel, delayed
 # params
 booking_site_url = 'https://www.ecommunity.my/'
 begin_time = time(00,00)
-end_time = time(0,15)
+end_time = time(00,15)
 max_try = 500
 # reservation_time and reservation_name are given as arguments when python script runs
 #reservation_time = int(sys.argv[1])
@@ -86,25 +86,28 @@ def make_a_reservation() -> bool:
                 current_time, running_time = check_current_time(begin_time, end_time)
                 continue
 
+            today_date = datetime.today()
+            end_date = datetime.today() + timedelta(days=7)
+
             print(f'----- try : {try_num} -----')
             # Agree to the T&C when it's 12.00a.m.
             driver.find_element(By.XPATH, '//*[@id="myModal"]/div/div/div[3]/button[1]').click()
 
-            # Find Badminton available timeslot
-            greybox = driver.find_elements(By.CLASS_NAME, 'date_cell')
+            if today_date.month != end_date.month:   
+                print('--going to next month page--')
+                #Go to next page
+                driver.find_element(By.CLASS_NAME, 'arrow-right').click()
+                # Find Badminton available timeslot
+                greybox = driver.find_elements(By.CLASS_NAME, 'date_cell')
             
-            #If available dates are in next month, click arrow button first. Otherwise, select the latest date
-            if greybox:
-                greybox[-1].click()
-            else:
-                print("Cannot find available date")
-                while not greybox:
-                    driver.find_element(By.CLASS_NAME, 'arrow-right').click()
-                    founddate = driver.find_elements(By.CLASS_NAME, 'date_cell')     
-                    if founddate:
-                        founddate[-1].click()
-                        break
-            
+            else:             
+                print('--remain at same page--')
+                # Find Badminton available timeslot
+                greybox = driver.find_elements(By.CLASS_NAME, 'date_cell')
+
+            greybox[-1].click()
+
+            #Get all badminton time slot and select latest available slot
             latest = driver.find_elements(By.NAME, 'bookingTime')
             latest[-1].click()
 
