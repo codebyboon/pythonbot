@@ -12,7 +12,6 @@ from selenium.common.exceptions import NoSuchElementException
 
 # access secret keys for the project
 from dotenv import dotenv_values
-import os
 
 # import whatsapp msg python script
 import whatsappmsg
