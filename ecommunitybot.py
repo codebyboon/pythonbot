@@ -47,8 +47,8 @@ def make_a_reservation(index) -> bool:
         # Open google chrome with the website
         options = Options()
         # comment out this line to see the process in chrome
-        # options.add_argument('--headless')
-        options.add_experimental_option("detach", True)
+        options.add_argument('--headless')
+        # options.add_experimental_option("detach", True)
         driver = webdriver.Chrome(options)
         driver.get(booking_site_url)
 
@@ -99,20 +99,19 @@ def make_a_reservation(index) -> bool:
             today_date = datetime.today()
             end_date = datetime.today() + timedelta(days=7)
 
-            print(f'----- try : {try_num} -----')
             # Agree to the T&C when it's 12.00a.m.
             driver.find_element(
                 By.XPATH, '//*[@id="myModal"]/div/div/div[3]/button[1]').click()
 
             if today_date.month != end_date.month:
-                print('--going to next month page--')
+                # print('--going to next month page--')
                 # Go to next page
                 driver.find_element(By.CLASS_NAME, 'arrow-right').click()
                 # Find Badminton available timeslot
                 greybox = driver.find_elements(By.CLASS_NAME, 'date_cell')
 
             else:
-                print('--remain at same page--')
+                # print('--remain at same page--')
                 # Find Badminton available timeslot
                 greybox = driver.find_elements(By.CLASS_NAME, 'date_cell')
 
@@ -141,7 +140,8 @@ def make_a_reservation(index) -> bool:
             print('Reserving court at time ' + booked_time)
             # Click Confirm button
             driver.find_element(
-                By.XPATH, '//*[@id="add-booking"]/div[1]/div[11]/button[2]')  # .click()
+                By.XPATH, '//*[@id="add-booking"]/div[1]/div[11]/button[2]').click()
+            
             return True
     except Exception as e:
         # print(e)
@@ -162,24 +162,40 @@ def try_booking(max_try: int = 1000) -> None:
         # try to get ticket
         # reservation_completed = make_a_reservation(reservation_time, reservation_name)
         reservation_completed = make_a_reservation(0)
+
+        if reservation_completed:
+
+            print('Reserved one session successfully.')
+
+            # To auto send successful reservation msg to whatsapp group
+            # TODO: Uncomment this for actual use.
+            # bookeddate = datetime.now() + timedelta(days=7)
+            # formattedDate = bookeddate.strftime('%Y-%m-%d')
+            # bookedday = bookeddate.strftime('%A')
+            # whatsappmsg.message(formattedDate, bookedday)
+        else:
+            print('Failed to book')
+        
     else:
         # Use Parallel to run multiple reservation attempts in parallel
         n_jobs = num_instances  # Set the number of parallel instances you want to run
         reservation_completed = Parallel(n_jobs=n_jobs)(
             delayed(make_a_reservation)(index) for index in range(n_jobs))
+        
+        if any(reservation_completed):
 
-    if any(reservation_completed):
+            print('Reserved multiple sessions successfully.')
 
-        print('Reserved a badminton court successfully.')
+            # To auto send successful reservation msg to whatsapp group
+            # TODO: Uncomment this for actual use.
+            # bookeddate = datetime.now() + timedelta(days=7)
+            # formattedDate = bookeddate.strftime('%Y-%m-%d')
+            # bookedday = bookeddate.strftime('%A')
+            # whatsappmsg.message(formattedDate, bookedday)
+        else:
+            print('Failed to book')
 
-        # To auto send successful reservation msg to whatsapp group
-        # TODO: Uncomment this for actual use.
-        # bookeddate = datetime.now() + timedelta(days=7)
-        # formattedDate = bookeddate.strftime('%Y-%m-%d')
-        # bookedday = bookeddate.strftime('%A')
-        # whatsappmsg.message(formattedDate, bookedday)
-    else:
-        print('Failed to book')
+
 
 
 if __name__ == '__main__':
