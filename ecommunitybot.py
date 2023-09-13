@@ -20,7 +20,7 @@ import whatsappmsg
 secrets = dotenv_values('.env')
 booking_site_url = secrets['URL']
 begin_time = time(00, 00)
-end_time = time(23, 15)
+end_time = time(00, 15)
 max_try = 500
 booked_time = ''
 
