@@ -47,8 +47,8 @@ def make_a_reservation(index) -> bool:
         # Open google chrome with the website
         options = Options()
         # comment out this line to see the process in chrome
-        options.add_argument('--headless')
-        # options.add_experimental_option("detach", True)
+        # options.add_argument('--headless')
+        options.add_experimental_option("detach", True)
         driver = webdriver.Chrome(options)
         driver.get(booking_site_url)
 
@@ -119,10 +119,8 @@ def make_a_reservation(index) -> bool:
 
             # Get all badminton time slot and select latest available slot
             latest = driver.find_elements(By.NAME, 'bookingTime')
-            if index == 0:
-                latest[-1].click()
-            elif index == 1:
-                latest[-3].click()
+
+            latest[-1].click()
 
             # Click add booking button after selecting latest time
             driver.find_element(
@@ -141,6 +139,7 @@ def make_a_reservation(index) -> bool:
             # Click Confirm button
             driver.find_element(
                 By.XPATH, '//*[@id="add-booking"]/div[1]/div[11]/button[2]').click()
+                
             
             return True
     except Exception as e:
