@@ -18,7 +18,7 @@ secrets = dotenv_values('.env')
 booking_site_url = secrets['URL']
 court_url = secrets['COURT_URL'] + sys.argv[1] + '/IBC2'
 begin_time = time(00, 00)
-end_time = time(23, 15)
+end_time = time(00, 15)
 
 myt = timezone(timedelta(hours=+8), 'MYT')
 
