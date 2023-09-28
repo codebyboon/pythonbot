@@ -13,16 +13,12 @@ from selenium.common.exceptions import NoSuchElementException
 # access secret keys for the project
 from dotenv import dotenv_values
 
-# import whatsapp msg python script
-import whatsappmsg
-
 # params
 secrets = dotenv_values('.env')
 booking_site_url = secrets['URL']
+court_url = secrets['COURT_URL'] + sys.argv[1] + '/IBC2'
 begin_time = time(00, 00)
-end_time = time(00, 15)
-max_try = 500
-booked_time = ''
+end_time = time(23, 15)
 
 myt = timezone(timedelta(hours=+8), 'MYT')
 
@@ -47,7 +43,6 @@ def make_a_reservation(index) -> bool:
         # Open google chrome with the website
         options = Options()
         # comment out this line to see the process in chrome
-        # options.add_argument('--headless')
         options.add_experimental_option("detach", True)
         driver = webdriver.Chrome(options)
         driver.get(booking_site_url)
@@ -64,15 +59,6 @@ def make_a_reservation(index) -> bool:
 
         driver.find_element(
             By.XPATH, '//*[@id="loginForm"]/div/div[3]/input[1]').click()
-
-        # Click eBooking button/image
-        driver.find_element(
-            By.XPATH, '//*[@id="feature-icons"]/div/table/tbody/tr[1]/td[3]/a/div').click()
-
-        # Click Badminton court
-        driver.implicitly_wait(1)
-        driver.find_element(
-            By.XPATH, '/html/body/div[2]/section[1]/div/section[2]/div/a[3]/div').click()
 
         # initialize the params
         current_time, running_time = check_current_time(begin_time, end_time)
@@ -96,28 +82,8 @@ def make_a_reservation(index) -> bool:
                     begin_time, end_time)
                 continue
 
-            today_date = datetime.today()
-            end_date = datetime.today() + timedelta(days=7)
-
-            # Agree to the T&C when it's 12.00a.m.
-            driver.find_element(
-                By.XPATH, '//*[@id="myModal"]/div/div/div[3]/button[1]').click()
-
-            if today_date.month != end_date.month:
-                # print('--going to next month page--')
-                # Go to next page
-                driver.find_element(By.CLASS_NAME, 'arrow-right').click()
-                # Find Badminton available timeslot
-                greybox = driver.find_elements(By.CLASS_NAME, 'date_cell')
-
-            else:
-                # print('--remain at same page--')
-                # Find Badminton available timeslot
-                greybox = driver.find_elements(By.CLASS_NAME, 'date_cell')
-
-            greybox[-1].click()
-
-            # Get all badminton time slot and select latest available slot
+            # Navigate straight to the court and Get all badminton time slot and select latest available slot
+            driver.get(court_url)
             latest = driver.find_elements(By.NAME, 'bookingTime')
 
             latest[-1].click()
@@ -135,71 +101,38 @@ def make_a_reservation(index) -> bool:
 
             booked_time = driver.find_element(
                 By.NAME, 'displayStartTime').get_attribute('value')
-            print('Reserving court at time ' + booked_time)
+            
             # Click Confirm button
             driver.find_element(
                 By.XPATH, '//*[@id="add-booking"]/div[1]/div[11]/button[2]').click()
                 
             
-            return True
+            return True, booked_time
     except Exception as e:
         # print(e)
         return False
 
-
-# def try_booking(reservation_time:int, reservation_name:str, max_try:int=1000) -> None:
-def try_booking(max_try: int = 1000) -> None:
+def try_booking() -> None:
     '''
-    Try booking a reservation until either one reservation is made successfully or the attempt time reaches the max_try
+    Try booking a reservation until either one reservation is made successfully
     '''
     # initialize the params
     reservation_completed = False
 
-    num_instances = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+    # try to get ticket
+    # reservation_completed = make_a_reservation(reservation_time, reservation_name)
+    reservation_completed, reserved_time = make_a_reservation(0)
 
-    if num_instances == 1:
-        # try to get ticket
-        # reservation_completed = make_a_reservation(reservation_time, reservation_name)
-        reservation_completed = make_a_reservation(0)
+    if reservation_completed:
 
-        if reservation_completed:
-
-            print('Reserved one session successfully.')
-
-            # To auto send successful reservation msg to whatsapp group
-            # TODO: Uncomment this for actual use.
-            # bookeddate = datetime.now() + timedelta(days=7)
-            # formattedDate = bookeddate.strftime('%Y-%m-%d')
-            # bookedday = bookeddate.strftime('%A')
-            # whatsappmsg.message(formattedDate, bookedday)
-        else:
-            print('Failed to book')
-        
+        print('Reserved one session successfully at', reserved_time)
     else:
-        # Use Parallel to run multiple reservation attempts in parallel
-        n_jobs = num_instances  # Set the number of parallel instances you want to run
-        reservation_completed = Parallel(n_jobs=n_jobs)(
-            delayed(make_a_reservation)(index) for index in range(n_jobs))
-        
-        if any(reservation_completed):
-
-            print('Reserved multiple sessions successfully.')
-
-            # To auto send successful reservation msg to whatsapp group
-            # TODO: Uncomment this for actual use.
-            # bookeddate = datetime.now() + timedelta(days=7)
-            # formattedDate = bookeddate.strftime('%Y-%m-%d')
-            # bookedday = bookeddate.strftime('%A')
-            # whatsappmsg.message(formattedDate, bookedday)
-        else:
-            print('Failed to book')
-
+        print('Failed to book')
 
 
 
 if __name__ == '__main__':
-    # try_booking(reservation_time, reservation_name, max_try)
     try:
-        try_booking(max_try)
+        try_booking()
     except KeyboardInterrupt:
         print("Execution interrupted by user.")
