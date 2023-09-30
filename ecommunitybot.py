@@ -34,7 +34,7 @@ def check_current_time(begin_time: time, end_time: time) -> Tuple[time, bool]:
 
 
 # def make_a_reservation(reservation_time:int, reservation_name:str) -> bool:
-def make_a_reservation(index) -> bool:
+def make_a_reservation() -> bool:
     '''
     Make a reservation for the given time and name at the booking site.
     Return the status if the reservation is made successfully or not.
@@ -59,6 +59,9 @@ def make_a_reservation(index) -> bool:
 
         driver.find_element(
             By.XPATH, '//*[@id="loginForm"]/div/div[3]/input[1]').click()
+        
+        # Navigate straight to the court and Get all badminton time slot and select latest available slot
+        driver.get(court_url)
 
         # initialize the params
         current_time, running_time = check_current_time(begin_time, end_time)
@@ -82,11 +85,14 @@ def make_a_reservation(index) -> bool:
                     begin_time, end_time)
                 continue
 
-            # Navigate straight to the court and Get all badminton time slot and select latest available slot
-            driver.get(court_url)
+            
             latest = driver.find_elements(By.NAME, 'bookingTime')
 
-            latest[-1].click()
+            if latest:
+                latest[-1].click()
+            else:
+                driver.refresh()
+                latest[-1].click()
 
             # Click add booking button after selecting latest time
             driver.find_element(
@@ -121,7 +127,7 @@ def try_booking() -> None:
 
     # try to get ticket
     # reservation_completed = make_a_reservation(reservation_time, reservation_name)
-    reservation_completed, reserved_time = make_a_reservation(0)
+    reservation_completed, reserved_time = make_a_reservation()
 
     if reservation_completed:
 
