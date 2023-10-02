@@ -85,14 +85,9 @@ def make_a_reservation() -> bool:
                     begin_time, end_time)
                 continue
 
-            
+            driver.refresh()
             latest = driver.find_elements(By.NAME, 'bookingTime')
-
-            if latest:
-                latest[-1].click()
-            else:
-                driver.refresh()
-                latest[-1].click()
+            latest[-1].click()
 
             # Click add booking button after selecting latest time
             driver.find_element(
@@ -110,7 +105,7 @@ def make_a_reservation() -> bool:
             
             # Click Confirm button
             driver.find_element(
-                By.XPATH, '//*[@id="add-booking"]/div[1]/div[11]/button[2]').click()
+                By.XPATH, '//*[@id="add-booking"]/div[1]/div[11]/button[2]')
                 
             
             return True, booked_time
