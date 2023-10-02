@@ -65,7 +65,6 @@ def make_a_reservation() -> bool:
 
         # initialize the params
         current_time, running_time = check_current_time(begin_time, end_time)
-        try_num = 1
 
         # repreat booking a reservation every second
         while True:
@@ -80,7 +79,6 @@ def make_a_reservation() -> bool:
                 else:
                     sleep(1)
 
-                try_num += 1
                 current_time, running_time = check_current_time(
                     begin_time, end_time)
                 continue
