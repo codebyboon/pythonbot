@@ -103,7 +103,7 @@ def make_a_reservation() -> bool:
             
             # Click Confirm button
             driver.find_element(
-                By.XPATH, '//*[@id="add-booking"]/div[1]/div[11]/button[2]')
+                By.XPATH, '//*[@id="add-booking"]/div[1]/div[11]/button[2]').click()
                 
             
             return True, booked_time
