@@ -10,6 +10,10 @@ from joblib import Parallel, delayed
 
 from selenium.common.exceptions import NoSuchElementException
 
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
 # access secret keys for the project
 from dotenv import dotenv_values
 
@@ -84,8 +88,12 @@ def make_a_reservation() -> bool:
                 continue
 
             driver.refresh()
-            latest = driver.find_elements(By.NAME, 'bookingTime')
-            latest[-1].click()
+
+            # Add a wait for the element to be clickable after the refresh
+            wait = WebDriverWait(driver, 10)  # Adjust the timeout as needed
+            # element = wait.until(EC.element_to_be_clickable((By.NAME, 'bookingTime')))
+            elements = wait.until(EC.presence_of_all_elements_located((By.NAME, 'bookingTime')))
+            elements[-1].click()
 
             # Click add booking button after selecting latest time
             driver.find_element(
