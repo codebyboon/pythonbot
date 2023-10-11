@@ -87,10 +87,11 @@ def make_a_reservation() -> bool:
                     begin_time, end_time)
                 continue
 
+            wait = WebDriverWait(driver, 20)  # Adjust the timeout as needed
             driver.refresh()
 
             # Add a wait for the element to be clickable after the refresh
-            wait = WebDriverWait(driver, 10)  # Adjust the timeout as needed
+            
             # element = wait.until(EC.element_to_be_clickable((By.NAME, 'bookingTime')))
             elements = wait.until(EC.presence_of_all_elements_located((By.NAME, 'bookingTime')))
             elements[-1].click()
@@ -111,7 +112,7 @@ def make_a_reservation() -> bool:
             
             # Click Confirm button
             driver.find_element(
-                By.XPATH, '//*[@id="add-booking"]/div[1]/div[11]/button[2]').click()
+                By.XPATH, '//*[@id="add-booking"]/div[1]/div[11]/button[2]')#.click()
                 
             
             return True, booked_time
