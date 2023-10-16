@@ -87,7 +87,7 @@ def make_a_reservation() -> bool:
                     begin_time, end_time)
                 continue
 
-            wait = WebDriverWait(driver, 20)  # Adjust the timeout as needed
+            wait = WebDriverWait(driver, 10)  # Adjust the timeout as needed
             driver.refresh()
 
             # Add a wait for the element to be clickable after the refresh
